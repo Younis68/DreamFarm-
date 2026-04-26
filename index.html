@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بڕێڤەبرنا مەزرەعەیان | Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --gray-text: #64748b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-color); 
+            padding: 20px 15px; 
+            text-align: right; 
+            color: var(--dark);
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .admin-container { max-width: 850px; margin: 0 auto; }
+        
+        .card-box {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 30px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+            transition: box-shadow 0.3s ease;
+        }
+        .card-box:hover { box-shadow: var(--shadow-md); }
+
+        .login-container { 
+            max-width: 420px; 
+            margin: 80px auto; 
+            background: var(--card-bg); 
+            padding: 40px; 
+            border-radius: var(--radius-lg); 
+            box-shadow: var(--shadow-lg); 
+            text-align: center; 
+            border: 1px solid var(--border-color);
+        }
+
+        h2, h3, h4 { color: var(--dark); font-weight: 600; margin-top: 0; }
+        h2 { font-size: 1.5rem; border-bottom: 2px solid var(--bg-color); padding-bottom: 15px; margin-bottom: 25px;}
+        h3 { font-size: 1.2rem; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; color: var(--primary);}
+        
+        .helper-text { font-size: 0.9rem; color: var(--gray-text); margin-bottom: 20px; display: block; font-weight: 500;}
+        .req-star { color: var(--danger); margin-right: 3px; font-weight: bold;}
+        .instruction-badge { display: inline-block; background: #e0f2fe; color: #0284c7; padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; margin-bottom: 10px; font-weight: bold; }
+
+        .form-group { margin-bottom: 20px; text-align: right; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.95rem; color: #334155; }
+
+        input[type="text"], input[type="password"], input[type="number"], input[type="url"], select, textarea { 
+            width: 100%; 
+            padding: 14px 18px; 
+            background-color: var(--bg-color); 
+            border: 1px solid var(--border-color); 
+            border-radius: var(--radius-md); 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            font-weight: normal;
+            font-size: 1rem;
+            color: var(--dark);
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            background-color: var(--card-bg);
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+        }
+
+        .password-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+        .password-wrapper input { padding-left: 45px; margin-bottom: 0 !important; }
+        .password-wrapper .toggle-password { position: absolute; left: 15px; cursor: pointer; color: var(--gray-text); font-size: 1.1rem; transition: color 0.2s; }
+        .password-wrapper .toggle-password:hover { color: var(--primary); }
+
+        input::placeholder, textarea::placeholder { color: #94a3b8; font-weight: normal; }
+
+        button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 14px 20px; 
+            border-radius: var(--radius-md); 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 1.1rem; 
+            margin-top: 10px; 
+            font-weight: bold; 
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+        button:hover { 
+            background: var(--primary-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.3);
+        }
+        button:active { transform: translateY(0); }
+        
+        #submitBtn { background: var(--secondary); box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); }
+        #submitBtn:hover { background: #059669; box-shadow: 0 6px 12px rgba(16, 185, 129, 0.3); }
+
+        .success-msg { background: #dcfce7; color: #15803d; padding: 15px; border-radius: var(--radius-md); display: none; margin-top: 20px; font-weight: bold; text-align: center; border: 1px solid #bbf7d0;}
+        
+        .lang-group { display: flex; flex-direction: column; gap: 8px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        
+        .input-sub-group { display: flex; flex-direction: column; }
+        .input-sub-group label { font-size: 0.85rem; color: var(--gray-text); margin-bottom: 5px; font-weight: normal;}
+
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        .features-grid label { 
+            font-weight: normal; cursor: pointer; background: var(--bg-color); 
+            padding: 12px 15px; border-radius: var(--radius-md); font-size: 0.95rem;
+            display: flex; align-items: center; gap: 10px; transition: all 0.2s ease;
+            border: 1px solid var(--border-color); margin: 0;
+        }
+        .features-grid label:hover { background: #f1f5f9; border-color: #cbd5e1; }
+        .features-grid input[type="checkbox"] { width: 18px; height: 18px; margin: 0; accent-color: var(--primary); cursor: pointer;}
+
+        .farms-list { margin-top: 50px; }
+        .farm-item { background: var(--card-bg); padding: 25px; margin-bottom: 20px; border-radius: var(--radius-lg); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); transition: transform 0.2s;}
+        .farm-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #cbd5e1;}
+        .farm-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid var(--bg-color); padding-bottom: 15px; }
+        .farm-header h4 { margin: 0; color: var(--dark); font-size: 1.3rem; }
+        
+        .action-buttons { display: flex; gap: 10px; }
+        .action-buttons button { width: auto; padding: 10px 15px; font-size: 1rem; margin: 0; border-radius: 8px; box-shadow: none;}
+        .delete-btn { background: #fee2e2; color: var(--danger); }
+        .delete-btn:hover { background: var(--danger); color: white; }
+        .edit-btn { background: #f1f5f9; color: var(--dark); }
+        .edit-btn:hover { background: #e2e8f0; }
+        .date-btn { background: #dbeafe; color: var(--primary); }
+        .date-btn:hover { background: var(--primary); color: white; }
+        
+        #uploadProgress { font-weight: bold; color: var(--primary); font-size: 0.95rem; margin-top: 10px; text-align: center;}
+        .preview-images { display: flex; flex-wrap: wrap; gap: 10px; }
+        .preview-images img { height: 80px; width: 80px; border-radius: 10px; border: 2px solid var(--border-color); object-fit: cover; box-shadow: var(--shadow-sm);}
+
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+        .modal-active { display: flex; }
+        .modal-box { background: var(--card-bg); width: 95%; max-width: 500px; padding: 35px; border-radius: var(--radius-lg); text-align: center; box-shadow: var(--shadow-lg); border: none;}
+        .close-btn { background: #f1f5f9; color: var(--dark); border: none; padding: 14px 15px; border-radius: var(--radius-md); cursor: pointer; margin-top: 15px; font-weight: bold;}
+        .close-btn:hover { background: #e2e8f0; }
+
+        .calendar-legend { display: flex; justify-content: center; gap: 25px; margin-bottom: 25px; font-size: 0.95rem; font-weight: bold; color: var(--gray-text); }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .color-box { width: 18px; height: 18px; border-radius: 6px; display: inline-block; }
+        .color-available { background-color: #f1f5f9; border: 2px solid #cbd5e1; }
+        .color-booked { background-color: var(--danger); border: 2px solid #b91c1c; }
+        .flatpickr-day.selected { background: var(--danger) !important; border-color: var(--danger) !important; color: white !important; font-weight: bold;}
+
+        .dashboard-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;
+            background: var(--card-bg); padding: 20px 25px; border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm); border: 1px solid var(--border-color);
+        }
+        .dashboard-header h2 { margin: 0; border: none; padding: 0; display: flex; align-items: center; gap: 10px;}
+
+        .stat-card { text-align: center; padding: 20px; margin-bottom: 0; border: none; background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--border-color); }
+        .stat-card h3 { justify-content: center; font-size: 1.1rem; margin-bottom: 10px;}
+        .stat-card h2 { border: none; margin: 0; font-size: 2.5rem; color: var(--dark); padding: 0; font-weight: bold;}
+
+        @media (max-width: 650px) { 
+            .grid-3, .grid-2 { grid-template-columns: 1fr; gap: 15px;} 
+            .dashboard-header { flex-direction: column; gap: 15px; text-align: center; }
+            .dashboard-header button { width: 100%; }
+        }
+        .admin-creds-display { background: #f8fafc; color: var(--gray-text); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px; font-size: 0.95rem; border: 1px dashed #cbd5e1; font-weight: normal; line-height: 1.8;}
+        
+        /* ستایلێن تایبەت ب ڕێزکرنا وێنان (Drag & Drop) */
+        .sortable-ghost { opacity: 0.4; background-color: #f8fafc; }
+        .cursor-move:hover { box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3); transform: scale(1.02); transition: all 0.2s ease; }
+    </style>
+</head>
+<body>
+
+<div id="login-section" class="login-container">
+    <div style="font-size: 3rem; color: var(--primary); margin-bottom: 10px;"><i class="fas fa-leaf"></i></div>
+    <h2>چوونە ژوورڤە</h2>
+    <span class="helper-text">ئەگەر تو خودانێ مەزرەعەی، کۆدێ خۆ یێ تایبەت لێرە بنڤیسە.</span>
+    <div class="form-group" style="margin-bottom: 10px;">
+        <div class="password-wrapper">
+            <input type="password" id="loginCode" placeholder="کۆدێ چوونە ژوورڤە لێرە بنڤیسە...">
+            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('loginCode', this)"></i>
+        </div>
+    </div>
+    <button onclick="loginUser()" style="margin-top: 15px;"><i class="fas fa-sign-in-alt" style="margin-left: 8px;"></i> چوونە ژوور</button>
+    <p id="login-error" style="color:var(--danger); display:none; margin-top:15px; font-size:0.95rem; font-weight: bold;">کۆد خەلەتە!</p>
+</div>
+
+<div id="main-dashboard" class="admin-container" style="display:none;">
+    
+    <div class="dashboard-header">
+        <h2><i class="fas fa-tasks" style="color: var(--primary);"></i> پەنجەرەیا بڕێڤەبرنێ</h2>
+        <button onclick="logout()" style="background:#f1f5f9; color:var(--danger); width:auto; padding:10px 20px; font-size:1rem; margin:0; border-radius: var(--radius-md); box-shadow: none;">
+            <i class="fas fa-sign-out-alt"></i> دەرکەفتن
+        </button>
+    </div>
+
+    <div id="add-farm-section">
+        <form id="add-farm-form">
+            
+            <div class="card-box" id="owner-creds-box">
+                <h3><i class="fas fa-shield-alt"></i> زانیاریێن خودانی</h3>
+                <span class="helper-text">ئەڤە دێ هاریکاریا خودانی کەت بۆ دەستکاری و حجزکرنا مەزرەعەیا خۆ.</span>
+                
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div class="input-sub-group">
+                        <label>ناڤێ خودانی</label>
+                        <input type="text" id="farmOwnerUsername" placeholder="نموونە: ئەحمەد">
+                    </div>
+                    <div class="input-sub-group">
+                        <label>ژمارا تەلەفۆنێ (نهێنییە)</label>
+                        <input type="text" id="farmOwnerPhone" placeholder="0750XXXXXXX" dir="ltr" style="text-align: left;">
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="input-sub-group">
+                        <label>کۆدێ مەزرەعێ (شفرە)</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="farmOwnerPassword" placeholder="نموونە: 123456">
+                            <i class="fas fa-eye toggle-password" onclick="togglePasswordVisibility('farmOwnerPassword', this)"></i>
+                        </div>
+                    </div>
+                    <div class="input-sub-group">
+                        <label>مافێ چەند مەزرەعەیان هەیە؟</label>
+                        <input type="number" id="farmOwnerLimit" placeholder="نموونە: 2" value="1" min="1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fas fa-home"></i> زانیاریێن سەرەکی یێن مەزرەعێ</h3>
+                <span class="instruction-badge">پێدڤییە ئەڤ بەشە ب تەمامی بهێتە پڕکرن</span>
+                <span class="helper-text">هیڤییە د خانەیا ئینگلیزی دا تەنێ پیتێن ئینگلیزی بکاربینه.</span>
+                
+                <div class="form-group">
+                    <label>ناڤێ مەزرەعێ</label>
+                    <div class="lang-group">
+                        <input type="text" id="farmNameAr" dir="rtl" placeholder="ب عەرەبی (نموونە: مزرعة الأحلام)">
+                        <input type="text" id="farmNameEn" dir="ltr" placeholder="ب ئینگلیزی (Example: Dream Farm)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>جهێ مەزرەعێ (باژێڕ)</label>
+                    <div class="lang-group">
+                        <input type="text" id="farmLocationAr" dir="rtl" placeholder="ب عەرەبی (نموونە: دهوك، زاخو)">
+                        <input type="text" id="farmLocationEn" dir="ltr" placeholder="ب ئینگلیزی (Example: Duhok, Zakho)">
+                    </div>
+                </div>
+                
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>کێ دشێت بگرێت؟</label>
+                    <select id="allowedType">
+                        <option value="all">بۆ هەمیان (خێزان و گەنج)</option>
+                        <option value="family">تەنێ بۆ خێزانان</option>
+                        <option value="youth">تەنێ بۆ گەنجان</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fas fa-clock"></i> دەمژمێرێن هاتن و دەرکەفتنێ</h3>
+                <span class="helper-text">دەمێن دروست یێن شێفتان دیار بکە دا کڕیار بزانن.</span>
+                <div class="grid-3">
+                    <div class="input-sub-group"><label>شێفتا ڕۆژێ</label><input type="text" id="timeDayStart" placeholder="دەستپێک"><input type="text" id="timeDayEnd" placeholder="دوماهی"></div>
+                    <div class="input-sub-group"><label>شێفتا شەڤێ</label><input type="text" id="timeNightStart" placeholder="دەستپێک"><input type="text" id="timeNightEnd" placeholder="دوماهی"></div>
+                    <div class="input-sub-group"><label>بۆ 24 دەمژمێران</label><input type="text" id="timeFullStart" placeholder="دەستپێک"><input type="text" id="timeFullEnd" placeholder="دوماهی"></div>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fas fa-money-bill-wave" style="color:var(--secondary);"></i> نرخێ کرێیێ (بەهایێ پۆلی)</h3>
+                <span class="helper-text">هیڤییە نرخێن مەزرەعەیا خۆ ب دروستی بنڤیسە. ئەگەر بەشەک نەبیت، ڤالا بهێلە.</span>
+                <label style="color:var(--primary); margin-top:10px; font-size:1.05rem;">١. ڕۆژێن ئاسایی (یەکشەمبی تا چوارشەمبی)</label>
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div class="input-sub-group"><input type="text" id="regDay" placeholder="نرخێ ڕۆژێ"></div>
+                    <div class="input-sub-group"><input type="text" id="regNight" placeholder="نرخێ شەڤێ"></div>
+                    <div class="input-sub-group"><input type="text" id="regFull" placeholder="نرخێ 24 دەمژمێر"></div>
+                </div>
+
+                <label style="color:var(--primary); font-size:1.05rem;">٢. ڕۆژێن بێهنڤەدانێ (پێنجشەمبی و ئەینی)</label>
+                <div class="grid-3">
+                    <div class="input-sub-group"><input type="text" id="weekDay" placeholder="نرخێ ڕۆژێ"></div>
+                    <div class="input-sub-group"><input type="text" id="weekNight" placeholder="نرخێ شەڤێ"></div>
+                    <div class="input-sub-group"><input type="text" id="weekFull" placeholder="نرخێ 24 دەمژمێر"></div>
+                </div>
+                <div style="margin-top: 10px; margin-bottom: 20px; background: #fef2f2; padding: 15px; border-radius: 8px; border: 1px dashed #fca5a5;">
+                    <label style="color: var(--danger); font-size:0.95rem; margin-bottom: 5px;">هەردوو ڕۆژان پێکڤە (ئەینی و شەمبی):</label>
+                    <input type="text" id="twoDaysPrice" placeholder="نموونە: 250,000" style="max-width: 100%; margin-bottom: 0;">
+                </div>
+
+                <label style="color:var(--primary); font-size:1.05rem;">٣. ڕۆژا شەمبی (ب تنێ)</label>
+                <div class="grid-3" style="margin-bottom: 20px;">
+                    <div class="input-sub-group"><input type="text" id="satDay" placeholder="نرخێ ڕۆژێ"></div>
+                    <div class="input-sub-group"><input type="text" id="satNight" placeholder="نرخێ شەڤێ"></div>
+                    <div class="input-sub-group"><input type="text" id="satFull" placeholder="نرخێ 24 دەمژمێر"></div>
+                </div>
+
+                <label style="color:var(--primary); font-size:1.05rem;">٤. جەژن و هەلکەفتێن تایبەت</label>
+                <div class="grid-3">
+                    <div class="input-sub-group"><input type="text" id="holDay" placeholder="نرخێ ڕۆژێ"></div>
+                    <div class="input-sub-group"><input type="text" id="holNight" placeholder="نرخێ شەڤێ"></div>
+                    <div class="input-sub-group"><input type="text" id="holFull" placeholder="نرخێ 24 دەمژمێر"></div>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fas fa-list-check"></i> تایبەتمەندی و خزمەتگوزاری</h3>
+                <div class="features-grid">
+                    <label><input type="checkbox" class="farm-feature" data-ar="مسبح" data-en="Swimming Pool"> مەسبەح</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="مسبح مدفأ" data-en="Heated Pool"> مەسبەحا گەرمکری</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="مسبح داخلي" data-en="Indoor Pool"> د ژوورڤە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="مسبح خارجي" data-en="Outdoor Pool"> ل دەرڤە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="جاكوزي" data-en="Jacuzzi"> جاکووزی</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="ملعب أطفال" data-en="Kids Playground"> یاریگەها زارۆکان</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="ملعب كرة قدم" data-en="Football Pitch"> یاریگەها پێپی</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="ملعب كرة طائرة" data-en="Volleyball Court"> بالە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="بلياردو" data-en="Billiards"> بیلیاڕد</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="تنس الطاولة" data-en="Table Tennis"> تێنسا مێزێ</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="مطبخ مجهز" data-en="Equipped Kitchen"> مەتبەخا تەمام</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="إنترنت واي فاي" data-en="WiFi"> ئینتەرنێت</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="نظام صوتي" data-en="Sound System"> سماعە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="تكييف" data-en="Air Conditioning"> سپلێت</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="نظام تدفئة" data-en="Heating System"> زۆپا/گەرمکەر</label>
+                    <label style="color:var(--danger); border-color: #fca5a5; background: #fef2f2;"><input type="checkbox" class="farm-feature" data-ar="كهرباء 24 ساعة" data-en="24/7 Electricity"> کارەبا بەردەوام</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="مكان للشواء" data-en="Barbecue Area"> جهێ برژاندنێ</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="جلسة خارجية" data-en="Outdoor Seating"> دانیشتن دەرڤە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="حديقة واسعة" data-en="Spacious Garden"> حەدیقە</label>
+                    <label><input type="checkbox" class="farm-feature" data-ar="موقف سيارات" data-en="Parking"> گەراج</label>
+                </div>
+
+                <div style="border-top: 2px dashed var(--border-color); padding-top: 20px; margin-top: 10px;">
+                    <h3 style="margin-bottom: 8px; font-size:1.1rem; color: #0891b2;"><i class="fas fa-water"></i> قەبارێ مەسبەحێ (ئارەزوومەندانە)</h3>
+                    <div class="grid-3">
+                        <div class="input-sub-group"><label>درێژی (مەتر)</label><input type="number" id="poolLength" placeholder="نموونە: 10" step="0.1"></div>
+                        <div class="input-sub-group"><label>پانی (مەتر)</label><input type="number" id="poolWidth" placeholder="نموونە: 5" step="0.1"></div>
+                        <div class="input-sub-group"><label>کویراتی (مەتر)</label><input type="number" id="poolDepth" placeholder="نموونە: 1.5" step="0.1"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-box">
+                <h3><i class="fas fa-align-right"></i> وەسف و زانیاریێن دی (ئارەزوومەندانە)</h3>
+                <span class="helper-text" style="color: #10b981;">ئەڤ بەشە ئارەزوومەندانەیە، ئەگەر نەڤێسی ژی کێشە نینە.</span>
+                <div class="lang-group">
+                    <textarea id="farmDescAr" rows="4" dir="rtl" placeholder="نموونە: مەزرەعەیا مە گەلەک یا ئارامە و نێزیکە ژ باژێڕی... (ب عەرەبی/کوردی)"></textarea>
+                    <textarea id="farmDescEn" rows="4" dir="ltr" placeholder="Example: Our farm is very quiet and close to the city... (ب ئینگلیزی)"></textarea>
+                </div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fas fa-images"></i> میدیا و وێنە</h3>
+                <div class="form-group">
+                    <label>وێنان هەلبژێرە</label>
+                    <div style="background: var(--bg-color); border: 2px dashed var(--primary); border-radius: var(--radius-md); padding: 30px; text-align: center; transition: all 0.3s ease; position: relative;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <input type="file" id="farmImageUpload" multiple accept="image/*" onchange="handleImageSelect(event)" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;">
+                        <p style="margin: 0; color: var(--gray-text);">کلیک بکە بۆ هەلبژارتنا وێنان</p>
+                    </div>
+                    <div id="uploadProgress"></div>
+                    <div id="currentImagesPreview" class="preview-images" style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;"></div>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>لینکا ڤیدیۆیێ (ئارەزوومەندانە):</label>
+                    <input type="url" id="farmVideo" dir="ltr" placeholder="نموونە: https://www.tiktok.com/@user/video/123">
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn"><i class="fas fa-save" style="margin-left: 8px;"></i> پۆست بکە و پاشکەوت بکە</button>
+            <p class="success-msg" id="msg">سەرکەفتییانە هاتە زێدەکرن! ✅</p>
+        </form>
+    </div>
+
+    <div class="farms-list">
+        <h2 id="list-title-text" style="border:none; padding:0; display: flex; align-items: center; gap: 10px;"><i class="fas fa-list-alt" style="color: var(--primary);"></i> لیستا مەزرەعەیان</h2>
+        
+        <div class="grid-3" style="margin-bottom: 25px; margin-top: 20px;">
+            <div class="stat-card">
+                <h3 style="color: var(--primary);"><i class="fas fa-home"></i> سەرجەمێ مەزرەعەیان</h3>
+                <h2 id="stat-total">0</h2>
+            </div>
+            <div class="stat-card">
+                <h3 style="color: var(--secondary);"><i class="fas fa-users"></i> بۆ خێزانان</h3>
+                <h2 id="stat-family">0</h2>
+            </div>
+            <div class="stat-card">
+                <h3 style="color: var(--danger);"><i class="fas fa-calendar-check"></i> حجزکری (ئەڤرۆ)</h3>
+                <h2 id="stat-booked">0</h2>
+            </div>
+        </div>
+
+        <div class="card-box" id="search-filter-section" style="padding: 20px; background: var(--bg-color); border: 1px solid var(--border-color);">
+            <div class="grid-2">
+                <div class="input-sub-group">
+                    <label style="color: var(--primary);"><i class="fas fa-search"></i> لێگەڕیان ب ناڤێ خودانی یان جهی</label>
+                    <input type="text" id="searchInput" placeholder="نموونە: ئەحمەد، دهۆک، زاخۆ..." onkeyup="filterFarms()" style="margin-bottom: 0;">
+                </div>
+                <div class="input-sub-group">
+                    <label style="color: var(--primary);"><i class="fas fa-filter"></i> فیلتەرکرن ب جۆری</label>
+                    <select id="filterType" onchange="filterFarms()" style="margin-bottom: 0;">
+                        <option value="all_types">هەمی جۆر</option>
+                        <option value="all">بۆ هەمیان (خێزان و گەنج)</option>
+                        <option value="family">تەنێ بۆ خێزانان</option>
+                        <option value="youth">تەنێ بۆ گەنجان</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="farms-container">
+            <p style="color: var(--gray-text); font-weight: normal; text-align: center; padding: 20px;">ل حالێ ئینانا داتایان دایە...</p>
+        </div>
+    </div>
+</div>
+
+<div id="date-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3 id="modal-farm-name" style="margin-bottom: 15px; justify-content: center; font-size: 1.4rem;"></h3>
+        <p style="margin-bottom: 25px; font-size: 1rem; color: var(--gray-text); font-weight: normal;">ئەو ڕۆژانە هەلبژێرە یێن کو هاتینە حجزکرن بۆ ڤێ مەزرەعێ:</p>
+        <div class="calendar-legend">
+            <div class="legend-item"><span class="color-box color-available"></span><span>بەردەستە</span></div>
+            <div class="legend-item"><span class="color-box color-booked"></span><span>حجزکرییە</span></div>
+        </div>
+        <input type="text" id="admin-date-picker" style="display:none;">
+        <input type="hidden" id="current-farm-id">
+        <button id="save-dates-btn" style="background: var(--primary); color: white; margin-top: 20px;" onclick="saveDates()"><i class="fas fa-save" style="margin-left: 5px;"></i> پاشکەوتکرنا ڕۆژان</button>
+        <button class="close-btn" onclick="closeModal()" style="width: 100%;">پاشگەزبوون</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://npmcdn.com/flatpickr/dist/l10n/ar.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDpRMklUOE5gll6rxAx3gCUDoJ2w8Ge5V0",
+        authDomain: "dreamfarm-4d68e.firebaseapp.com",
+        projectId: "dreamfarm-4d68e",
+        messagingSenderId: "512563841088",
+        appId: "1:512563841088:web:c071cc5a131b07da8877a5"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const imgbbApiKey = "cb9a6b057052d5cc0dff9c9fa28cbb12"; 
+
+    const MASTER_ADMIN_CODE = "A";
+
+    let currentUser = null; 
+    let editId = null; 
+    let currentExistingImages = []; 
+    let selectedNewFiles = []; 
+    let allFarmsData = []; 
+    let fpInstance = null; 
+
+    // فەنکشنی هەلبژارتنا وێنان ب ID یا تایبەت
+    function handleImageSelect(event) {
+        const files = event.target.files;
+        for (let i = 0; i < files.length; i++) {
+            files[i].customId = Math.random().toString(36).substring(7);
+            selectedNewFiles.push(files[i]);
+        }
+        event.target.value = ''; 
+        renderAllImages();
+    }
+
+    // فەنکشنی نیشاندانا هەمی وێنان و ڕێزکرن ب Drag & Drop
+    function renderAllImages() {
+        const previewDiv = document.getElementById('currentImagesPreview');
+        previewDiv.innerHTML = "";
+
+        // وێنەیێن کەڤن یێن د داتابەیسێ دا
+        currentExistingImages.forEach((imgUrl) => {
+            if (imgUrl !== "dream.jpg") {
+                previewDiv.innerHTML += `
+                    <div class="image-item cursor-move" data-type="existing" data-url="${imgUrl}" style="position: relative; display: inline-block; cursor: grab;">
+                        <img src="${imgUrl}" style="height: 80px; width: 80px; border-radius: 10px; object-fit: cover; pointer-events: none;">
+                        <button type="button" onclick="removeOldImage('${imgUrl}')" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10;">X</button>
+                    </div>
+                `;
+            }
+        });
+
+        // وێنەیێن نووی یێن هاتینە هەلبژارتن
+        selectedNewFiles.forEach((file) => {
+            const objectUrl = URL.createObjectURL(file);
+            previewDiv.innerHTML += `
+                <div class="image-item cursor-move" data-type="new" data-customid="${file.customId}" style="position: relative; display: inline-block; cursor: grab;">
+                    <img src="${objectUrl}" style="height: 80px; width: 80px; border-radius: 10px; object-fit: cover; border: 2px solid #2563eb; pointer-events: none;">
+                    <button type="button" onclick="removeNewImage('${file.customId}')" style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); z-index: 10;">X</button>
+                </div>
+            `;
+        });
+
+        // چالاککرنا ڕێزکرنێ (Sortable)
+        if (window.sortableInstance) {
+            window.sortableInstance.destroy();
+        }
+        window.sortableInstance = new Sortable(previewDiv, {
+            animation: 150,
+            ghostClass: 'sortable-ghost',
+            dragClass: 'sortable-drag',
+            cursor: 'grabbing'
+        });
+    }
+
+    function removeNewImage(customId) {
+        selectedNewFiles = selectedNewFiles.filter(file => file.customId !== customId);
+        renderAllImages();
+    }
+
+    function removeOldImage(imgUrl) {
+        currentExistingImages = currentExistingImages.filter(url => url !== imgUrl);
+        renderAllImages();
+    }
+
+    function togglePasswordVisibility(inputId, iconElement) {
+        const input = document.getElementById(inputId);
+        if (input.type === "password") {
+            input.type = "text";
+            iconElement.classList.remove("fa-eye");
+            iconElement.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            iconElement.classList.remove("fa-eye-slash");
+            iconElement.classList.add("fa-eye");
+        }
+    }
+
+    async function loginUser() {
+        const code = document.getElementById('loginCode').value.trim();
+        const errorMsg = document.getElementById('login-error');
+        
+        if(!code) {
+            errorMsg.innerText = "هیڤییە کۆدێ چوونە ژوورڤە بنڤیسە!";
+            errorMsg.style.display = "block";
+            return;
+        }
+
+        if(code === MASTER_ADMIN_CODE) {
+            currentUser = { role: "admin", code: code };
+            showDashboard();
+            return;
+        }
+
+        try {
+            const snapshot = await db.collection("farms").where("ownerPassword", "==", code).get();
+            if(!snapshot.empty) {
+                const firstData = snapshot.docs[0].data();
+                currentUser = { 
+                    role: "owner", 
+                    code: code,
+                    limit: parseInt(firstData.ownerLimit) || 1,
+                    username: firstData.ownerUsername || "",
+                    phone: firstData.ownerPhone || ""
+                };
+                showDashboard();
+            } else {
+                errorMsg.innerText = "کۆدێ تە خەلەتە یان کار ناکەت!";
+                errorMsg.style.display = "block";
+            }
+        } catch (error) {
+            errorMsg.innerText = "کێشەیەک د ئینتەرنێتێ دا هەیە!";
+            errorMsg.style.display = "block";
+        }
+    }
+
+    function showDashboard() {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('main-dashboard').style.display = 'block';
+        
+        if (currentUser.role === 'owner') {
+            document.getElementById('owner-creds-box').style.display = 'none'; 
+            document.getElementById('search-filter-section').style.display = 'none'; 
+            document.getElementById('list-title-text').innerHTML = '<i class="fas fa-th-large" style="color: var(--primary);"></i> مەزرەعەیێن تە';
+        } else {
+            document.getElementById('add-farm-section').style.display = 'block';
+            document.getElementById('owner-creds-box').style.display = 'block'; 
+            document.getElementById('search-filter-section').style.display = 'block'; 
+            document.getElementById('list-title-text').innerHTML = '<i class="fas fa-list-alt" style="color: var(--primary);"></i> لیستا مەزرەعەیان';
+        }
+        
+        loadFarms();
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('loginCode').value = '';
+        document.getElementById('main-dashboard').style.display = 'none';
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('add-farm-form').reset();
+        editId = null;
+        
+        currentExistingImages = [];
+        selectedNewFiles = [];
+        document.getElementById('currentImagesPreview').innerHTML = "";
+        
+        document.querySelectorAll('.toggle-password').forEach(icon => {
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        });
+        document.getElementById('loginCode').type = "password";
+        document.getElementById('farmOwnerPassword').type = "password";
+    }
+
+    async function loadFarms() {
+        const container = document.getElementById('farms-container');
+        container.innerHTML = "<p style='color: var(--gray-text); text-align:center; padding:20px; font-weight:normal;'>ل حالێ ئینانا داتایان دایە...</p>";
+        
+        try {
+            const snapshot = await db.collection("farms").get();
+            allFarmsData = []; 
+            
+            snapshot.forEach(doc => {
+                allFarmsData.push({ id: doc.id, ...doc.data() }); 
+            });
+
+            allFarmsData.sort((a,b) => {
+                const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
+                const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
+                return tB - tA;
+            });
+
+            if(currentUser.role === 'owner') {
+                allFarmsData = allFarmsData.filter(f => f.ownerPassword === currentUser.code);
+                
+                if (!editId) {
+                    if (allFarmsData.length < currentUser.limit) {
+                        document.getElementById('add-farm-section').style.display = 'block';
+                    } else {
+                        document.getElementById('add-farm-section').style.display = 'none';
+                    }
+                }
+            }
+
+            updateDashboardStats();
+            renderFarmsOnScreen(allFarmsData);
+
+        } catch (error) {
+            console.error("Error fetching farms: ", error); 
+            container.innerHTML = `<p style='color: var(--danger); text-align:center;'>کێشە هەیە: ${error.message}</p>`;
+        }
+    }
+
+    function renderFarmsOnScreen(farmsArray) {
+        const container = document.getElementById('farms-container');
+        container.innerHTML = "";
+
+        if(farmsArray.length === 0) {
+            container.innerHTML = "<p style='color: var(--gray-text); text-align:center; padding:20px; font-weight:normal;'>چ مەزرەعە نەهاتنە دیتن.</p>";
+            return;
+        }
+
+        farmsArray.forEach(farm => {
+            let displayName = farm.ownerUsername ? farm.ownerUsername : "بێ ناڤێ خودانی";
+
+            let adminCredsHTML = "";
+            if (currentUser.role === 'admin') {
+                adminCredsHTML = `
+                <div class="admin-creds-display">
+                    <strong>ناڤێ مەزرەعێ:</strong> ${farm.name?.ar || farm.name || 'نینە'} <br>
+                    <strong>کۆدێ خودانی:</strong> <span style="color:var(--primary);">${farm.ownerPassword || 'نینە'}</span> <br>
+                    <strong>ژمارا تەلەفۆنێ:</strong> <span style="color:#0891b2; direction:ltr; display:inline-block;">${farm.ownerPhone || 'نەهاتیە نڤیسین'}</span>
+                    <div style="margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 10px;">
+                        <strong>مافێ تۆمارکرنێ:</strong> دکارێت <span style="color:var(--danger); font-weight:bold; font-size: 1.1rem; margin:0 5px;">${farm.ownerLimit || 1}</span> مەزرەعەیان تۆمار بکەت.
+                    </div>
+                </div>
+                `;
+            }
+
+            container.innerHTML += `
+                <div class="farm-item">
+                    <div class="farm-header">
+                        <h4 style="color: var(--primary);"><i class="fas fa-user-circle" style="margin-left:5px;"></i> ${displayName}</h4>
+                        <div class="action-buttons">
+                            <button type="button" class="date-btn" onclick="openDateModal('${farm.id}')"><i class="fas fa-calendar-alt"></i></button>
+                            <button type="button" class="edit-btn" onclick="editFarm('${farm.id}')"><i class="fas fa-pen"></i></button>
+                            ${currentUser.role === 'admin' ? `<button type="button" class="delete-btn" onclick="deleteFarm('${farm.id}')"><i class="fas fa-trash"></i></button>` : ''}
+                        </div>
+                    </div>
+                    ${adminCredsHTML}
+                </div>
+            `;
+        });
+    }
+
+    function filterFarms() {
+        const searchText = document.getElementById('searchInput').value.toLowerCase();
+        const filterType = document.getElementById('filterType').value;
+
+        const filteredData = allFarmsData.filter(farm => {
+            let ownerName = (farm.ownerUsername || "").toLowerCase(); 
+            let nameAr = (farm.name?.ar || farm.name || "").toLowerCase();
+            let locAr = (farm.location?.ar || farm.location || "").toLowerCase();
+            let phoneNum = (farm.ownerPhone || "");
+
+            const matchesSearch = ownerName.includes(searchText) || nameAr.includes(searchText) || locAr.includes(searchText) || phoneNum.includes(searchText);
+            const matchesType = filterType === 'all_types' || farm.allowedType === filterType;
+
+            return matchesSearch && matchesType;
+        });
+
+        renderFarmsOnScreen(filteredData);
+    }
+
+    function updateDashboardStats() {
+        document.getElementById('stat-total').innerText = allFarmsData.length;
+
+        const familyFarms = allFarmsData.filter(f => f.allowedType === 'family' || f.allowedType === 'all').length;
+        document.getElementById('stat-family').innerText = familyFarms;
+
+        const today = new Date().toISOString().split('T')[0]; 
+        let bookedToday = 0;
+        allFarmsData.forEach(farm => {
+            if (farm.bookedDates && farm.bookedDates.includes(today)) {
+                bookedToday++;
+            }
+        });
+        document.getElementById('stat-booked').innerText = bookedToday;
+    }
+
+    const form = document.getElementById('add-farm-form');
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+
+        const progressDiv = document.getElementById('uploadProgress');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ل حالێ پاشکەوتکرنێ دایە...';
+
+        try {
+            let finalImageUrls = []; 
+            const imageElements = document.querySelectorAll('#currentImagesPreview .image-item');
+            
+            // هژمارتنا وێنەیێن نووی بۆ دەقێ پێشڤەچوونێ
+            let newUploadCount = 0;
+            imageElements.forEach(el => { if(el.dataset.type === 'new') newUploadCount++; });
+            let uploadedCount = 0;
+
+            // خڕڤەکرن و ئەپلۆدکرنا وێنان ل دووڤ ڕێزبەندیا نووی
+            for (let el of imageElements) {
+                if (el.dataset.type === 'existing') {
+                    finalImageUrls.push(el.dataset.url);
+                } else if (el.dataset.type === 'new') {
+                    const customId = el.dataset.customid;
+                    const file = selectedNewFiles.find(f => f.customId === customId);
+                    
+                    if (file) {
+                        uploadedCount++;
+                        progressDiv.innerText = `ل حالێ ئەپلۆدکرنا وێنێ ${uploadedCount} ژ ${newUploadCount}...`;
+                        const formData = new FormData();
+                        formData.append("image", file);
+                        const response = await fetch(`https://api.imgbb.com/1/upload?key=${imgbbApiKey}`, { method: "POST", body: formData });
+                        const data = await response.json();
+                        if(data.success) {
+                            finalImageUrls.push(data.data.url);
+                        }
+                    }
+                }
+            }
+
+            progressDiv.innerText = "وێنە ب سەرکەفتییانە هاتنە ڕێکخستن و ئەپلۆدکرن!";
+
+            if (finalImageUrls.length === 0) finalImageUrls = ["dream.jpg"]; 
+
+            const selectedFeaturesAr = [];
+            const selectedFeaturesEn = [];
+            
+            document.querySelectorAll('.farm-feature:checked').forEach(cb => {
+                let arStr = cb.getAttribute('data-ar');
+                let enStr = cb.getAttribute('data-en');
+
+                if (arStr === "مسبح") {
+                    const pLen = document.getElementById('poolLength').value;
+                    const pWid = document.getElementById('poolWidth').value;
+                    const pDep = document.getElementById('poolDepth').value;
+                    
+                    if (pLen || pWid || pDep) {
+                        let arDetails = [];
+                        if (pLen) arDetails.push(`الطول ${pLen}م`);
+                        if (pWid) arDetails.push(`العرض ${pWid}م`);
+                        if (pDep) arDetails.push(`العمق ${pDep}م`);
+                        arStr = `مسبح (${arDetails.join('، ')})`;
+
+                        let enDetails = [];
+                        if (pLen) enDetails.push(`Length ${pLen}m`);
+                        if (pWid) enDetails.push(`Width ${pWid}m`);
+                        if (pDep) enDetails.push(`Depth ${pDep}m`);
+                        enStr = `Swimming Pool (${enDetails.join(', ')})`;
+                    }
+                }
+                selectedFeaturesAr.push(arStr);
+                selectedFeaturesEn.push(enStr);
+            });
+
+            let ownerNameVal = document.getElementById('farmOwnerUsername').value;
+            let ownerPassVal = document.getElementById('farmOwnerPassword').value;
+            let ownerPhoneVal = document.getElementById('farmOwnerPhone').value;
+            let ownerLimitVal = document.getElementById('farmOwnerLimit').value || 1;
+
+            if (currentUser.role === 'owner') {
+                ownerNameVal = currentUser.username;
+                ownerPassVal = currentUser.code;
+                ownerPhoneVal = currentUser.phone;
+                ownerLimitVal = currentUser.limit;
+            }
+
+            const farmData = {
+                ownerUsername: ownerNameVal,
+                ownerPassword: ownerPassVal,
+                ownerPhone: ownerPhoneVal, 
+                ownerLimit: ownerLimitVal,
+                name: { ar: document.getElementById('farmNameAr').value, en: document.getElementById('farmNameEn').value },
+                location: { ar: document.getElementById('farmLocationAr').value, en: document.getElementById('farmLocationEn').value },
+                description: { ar: document.getElementById('farmDescAr').value, en: document.getElementById('farmDescEn').value },
+                prices: {
+                    regular: { day: document.getElementById('regDay').value, night: document.getElementById('regNight').value, full: document.getElementById('regFull').value },
+                    weekend: { 
+                        day: document.getElementById('weekDay').value, 
+                        night: document.getElementById('weekNight').value, 
+                        full: document.getElementById('weekFull').value,
+                        twoDays: document.getElementById('twoDaysPrice').value
+                    },
+                    saturday: { day: document.getElementById('satDay').value, night: document.getElementById('satNight').value, full: document.getElementById('satFull').value },
+                    holiday: { day: document.getElementById('holDay').value, night: document.getElementById('holNight').value, full: document.getElementById('holFull').value }
+                }, 
+                shiftTimes: {
+                    day: { start: document.getElementById('timeDayStart').value, end: document.getElementById('timeDayEnd').value },
+                    night: { start: document.getElementById('timeNightStart').value, end: document.getElementById('timeNightEnd').value },
+                    full: { start: document.getElementById('timeFullStart').value, end: document.getElementById('timeFullEnd').value }
+                },
+                images: finalImageUrls, 
+                videoUrl: document.getElementById('farmVideo').value,
+                allowedType: document.getElementById('allowedType').value,
+                
+                features: {
+                    ar: selectedFeaturesAr,
+                    en: selectedFeaturesEn
+                },
+                
+                poolSize: { 
+                    length: document.getElementById('poolLength').value,
+                    width: document.getElementById('poolWidth').value,
+                    depth: document.getElementById('poolDepth').value
+                }
+            };
+
+            if (editId) {
+                await db.collection("farms").doc(editId).update(farmData);
+                document.getElementById('msg').innerText = "گوهۆڕین ب سەرکەفتییانە هاتنە پاشکەوتکرن! ✅";
+                editId = null;
+            } else {
+                farmData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                farmData.bookedDates = []; 
+                await db.collection("farms").add(farmData);
+                document.getElementById('msg').innerText = "سەرکەفتییانە هاتە زێدەکرن! ✅";
+            }
+
+            document.getElementById('msg').style.display = 'block';
+            if(currentUser.role === 'admin') form.reset();
+            
+            currentExistingImages = [];
+            selectedNewFiles = [];
+            renderAllImages();
+            
+            progressDiv.innerText = "";
+            document.getElementById('farmImageUpload').value = '';
+            
+            setTimeout(() => { document.getElementById('msg').style.display = 'none'; btn.innerHTML = '<i class="fas fa-save" style="margin-left: 8px;"></i> پۆست بکە و پاشکەوت بکە';}, 3000);
+            
+            loadFarms();
+            
+        } catch (error) {
+            alert("کێشەیەک هەبوو: " + error.message);
+            btn.innerHTML = '<i class="fas fa-save" style="margin-left: 8px;"></i> پۆست بکە و پاشکەوت بکە';
+        } finally {
+            btn.disabled = false;
+        }
+    });
+
+    async function editFarm(id) {
+        document.getElementById('add-farm-section').style.display = 'block';
+        if(currentUser.role === 'owner') {
+            document.getElementById('owner-creds-box').style.display = 'none'; 
+        } else {
+            document.getElementById('owner-creds-box').style.display = 'block'; 
+        }
+
+        const farm = allFarmsData.find(f => f.id === id);
+        if(!farm) return;
+
+        document.getElementById('farmOwnerUsername').value = farm.ownerUsername || "";
+        document.getElementById('farmOwnerPassword').value = farm.ownerPassword || "";
+        document.getElementById('farmOwnerPhone').value = farm.ownerPhone || ""; 
+        document.getElementById('farmOwnerLimit').value = farm.ownerLimit || "1"; 
+        
+        document.getElementById('farmNameAr').value = farm.name?.ar || farm.name || "";
+        document.getElementById('farmNameEn').value = farm.name?.en || "";
+        document.getElementById('farmLocationAr').value = farm.location?.ar || farm.location || "";
+        document.getElementById('farmLocationEn').value = farm.location?.en || "";
+        document.getElementById('farmDescAr').value = farm.description?.ar || farm.description || "";
+        document.getElementById('farmDescEn').value = farm.description?.en || "";
+        
+        if(farm.shiftTimes) {
+            document.getElementById('timeDayStart').value = farm.shiftTimes.day?.start || ""; document.getElementById('timeDayEnd').value = farm.shiftTimes.day?.end || "";
+            document.getElementById('timeNightStart').value = farm.shiftTimes.night?.start || ""; document.getElementById('timeNightEnd').value = farm.shiftTimes.night?.end || "";
+            document.getElementById('timeFullStart').value = farm.shiftTimes.full?.start || ""; document.getElementById('timeFullEnd').value = farm.shiftTimes.full?.end || "";
+        }
+
+        if(farm.prices) {
+            document.getElementById('regDay').value = farm.prices.regular?.day || ""; document.getElementById('regNight').value = farm.prices.regular?.night || ""; document.getElementById('regFull').value = farm.prices.regular?.full || "";
+            
+            document.getElementById('weekDay').value = farm.prices.weekend?.day || ""; 
+            document.getElementById('weekNight').value = farm.prices.weekend?.night || ""; 
+            document.getElementById('weekFull').value = farm.prices.weekend?.full || "";
+            
+            document.getElementById('twoDaysPrice').value = farm.prices.weekend?.twoDays || (typeof farm.prices.twoDaysPromo === 'string' ? farm.prices.twoDaysPromo : (farm.prices.twoDaysPromo?.full || "")) || "";
+            
+            document.getElementById('satDay').value = farm.prices.saturday?.day || ""; document.getElementById('satNight').value = farm.prices.saturday?.night || ""; document.getElementById('satFull').value = farm.prices.saturday?.full || "";
+            document.getElementById('holDay').value = farm.prices.holiday?.day || ""; document.getElementById('holNight').value = farm.prices.holiday?.night || ""; document.getElementById('holFull').value = farm.prices.holiday?.full || "";
+        }
+
+        document.getElementById('farmVideo').value = farm.videoUrl || "";
+        document.getElementById('allowedType').value = farm.allowedType || "all";
+
+        document.getElementById('poolLength').value = farm.poolSize?.length || "";
+        document.getElementById('poolWidth').value = farm.poolSize?.width || "";
+        document.getElementById('poolDepth').value = farm.poolSize?.depth || "";
+
+        document.querySelectorAll('.farm-feature').forEach(cb => {
+            const arVal = cb.getAttribute('data-ar');
+            const enVal = cb.getAttribute('data-en');
+            let isChecked = false;
+
+            if (farm.features) {
+                if (farm.features.ar && Array.isArray(farm.features.ar)) {
+                    isChecked = farm.features.ar.some(f => f.includes(arVal));
+                } else if (Array.isArray(farm.features)) {
+                    isChecked = farm.features.some(f => {
+                        if (typeof f === 'string') return f.includes(arVal) || f.includes(enVal);
+                        if (typeof f === 'object') return (f.ar && f.ar.includes(arVal)) || (f.en && f.en.includes(enVal));
+                        return false;
+                    });
+                }
+            }
+            cb.checked = isChecked;
+        });
+
+        if(farm.images) {
+            currentExistingImages = [...farm.images]; 
+        } else {
+            currentExistingImages = [];
+        }
+        selectedNewFiles = []; 
+        renderAllImages(); 
+        
+        editId = id; 
+        document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save" style="margin-left: 8px;"></i> پاشکەوتکرنا گوهۆڕینان';
+        window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    }
+
+    async function deleteFarm(id) {
+        if (confirm("ئەرێ تو یێ پشتڕاستی کو دڤێت ڤێ مەزرەعێ ڕەشبکەی؟")) {
+            await db.collection("farms").doc(id).delete();
+            alert("ب سەرکەفتییانە هاتە ڕەشکرن ✅");
+            loadFarms(); 
+        }
+    }
+
+    window.openDateModal = (id) => {
+        const farm = allFarmsData.find(f => f.id === id);
+        if (!farm) return;
+        
+        document.getElementById('modal-farm-name').innerText = farm.ownerUsername ? `ڕۆژێن مەزرەعەیا ${farm.ownerUsername}` : "ڕۆژێن مەزرەعێ";
+        document.getElementById('current-farm-id').value = id;
+
+        if (fpInstance) fpInstance.destroy();
+        fpInstance = flatpickr("#admin-date-picker", { mode: "multiple", locale: "ar", dateFormat: "Y-m-d", defaultDate: farm.bookedDates || [], inline: true });
+        document.getElementById('date-modal').classList.add('modal-active');
+    }
+
+    window.closeModal = () => document.getElementById('date-modal').classList.remove('modal-active');
+
+    window.saveDates = async () => {
+        const id = document.getElementById('current-farm-id').value;
+        const selectedDates = fpInstance.selectedDates.map(date => flatpickr.formatDate(date, "Y-m-d"));
+        const btn = document.getElementById('save-dates-btn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ل حالێ پاشکەوتکرنێ...'; 
+        btn.disabled = true;
+        try {
+            await db.collection("farms").doc(id).update({ bookedDates: selectedDates });
+            alert("ڕۆژ ب سەرکەفتییانە هاتنە حجزکرن!");
+            closeModal(); loadFarms(); 
+        } finally {
+            btn.innerHTML = '<i class="fas fa-save" style="margin-left: 5px;"></i> پاشکەوتکرنا ڕۆژان'; 
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>
