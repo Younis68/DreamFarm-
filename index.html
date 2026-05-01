@@ -194,9 +194,12 @@
         }
         .admin-creds-display { background: #f8fafc; color: var(--gray-text); padding: 15px; border-radius: var(--radius-md); margin-bottom: 10px; font-size: 0.95rem; border: 1px dashed #cbd5e1; font-weight: normal; line-height: 1.8;}
         
-        /* ستایلێن تایبەت ب ڕێزکرنا وێنان (Drag & Drop) */
         .sortable-ghost { opacity: 0.4; background-color: #f8fafc; }
         .cursor-move:hover { box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3); transform: scale(1.02); transition: all 0.2s ease; }
+        
+        /* شێوازێ ئایکۆنا ڕێزکرنێ */
+        .drag-handle { transition: color 0.2s; }
+        .drag-handle:hover { color: var(--primary) !important; }
     </style>
 </head>
 <body>
@@ -226,11 +229,9 @@
 
     <div id="add-farm-section">
         <form id="add-farm-form">
-            
             <div class="card-box" id="owner-creds-box">
                 <h3><i class="fas fa-shield-alt"></i> زانیاریێن خودانی</h3>
                 <span class="helper-text">ئەڤە دێ هاریکاریا خودانی کەت بۆ دەستکاری و حجزکرنا مەزرەعەیا خۆ.</span>
-                
                 <div class="grid-2" style="margin-bottom: 15px;">
                     <div class="input-sub-group">
                         <label>ناڤێ خودانی</label>
@@ -241,7 +242,6 @@
                         <input type="text" id="farmOwnerPhone" placeholder="0750XXXXXXX" dir="ltr" style="text-align: left;">
                     </div>
                 </div>
-                
                 <div class="grid-2">
                     <div class="input-sub-group">
                         <label>کۆدێ مەزرەعێ (شفرە)</label>
@@ -402,9 +402,13 @@
     </div>
 
     <div class="farms-list">
-        <h2 id="list-title-text" style="border:none; padding:0; display: flex; align-items: center; gap: 10px;"><i class="fas fa-list-alt" style="color: var(--primary);"></i> لیستا مەزرەعەیان</h2>
         
-        <div class="grid-3" style="margin-bottom: 25px; margin-top: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 id="list-title-text" style="border:none; padding:0; display: flex; align-items: center; gap: 10px; margin: 0;"><i class="fas fa-list-alt" style="color: var(--primary);"></i> لیستا مەزرەعەیان</h2>
+            <button id="saveOrderBtn" onclick="saveFarmOrder()" style="display:none; background: var(--warning); width: auto; padding: 10px 15px; margin: 0; color: #fff;"><i class="fas fa-save"></i> پاشکەوتکرنا ڕیزبەندیێ</button>
+        </div>
+        
+        <div class="grid-3" style="margin-bottom: 25px; margin-top: 10px;">
             <div class="stat-card">
                 <h3 style="color: var(--primary);"><i class="fas fa-home"></i> سەرجەمێ مەزرەعەیان</h3>
                 <h2 id="stat-total">0</h2>
@@ -472,7 +476,9 @@
         messagingSenderId: "512563841088",
         appId: "1:512563841088:web:c071cc5a131b07da8877a5"
     };
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
     const imgbbApiKey = "cb9a6b057052d5cc0dff9c9fa28cbb12"; 
 
@@ -485,7 +491,6 @@
     let allFarmsData = []; 
     let fpInstance = null; 
 
-    // فەنکشنی هەلبژارتنا وێنان ب ID یا تایبەت
     function handleImageSelect(event) {
         const files = event.target.files;
         for (let i = 0; i < files.length; i++) {
@@ -496,12 +501,10 @@
         renderAllImages();
     }
 
-    // فەنکشنی نیشاندانا هەمی وێنان و ڕێزکرن ب Drag & Drop
     function renderAllImages() {
         const previewDiv = document.getElementById('currentImagesPreview');
         previewDiv.innerHTML = "";
 
-        // وێنەیێن کەڤن یێن د داتابەیسێ دا
         currentExistingImages.forEach((imgUrl) => {
             if (imgUrl !== "dream.jpg") {
                 previewDiv.innerHTML += `
@@ -513,7 +516,6 @@
             }
         });
 
-        // وێنەیێن نووی یێن هاتینە هەلبژارتن
         selectedNewFiles.forEach((file) => {
             const objectUrl = URL.createObjectURL(file);
             previewDiv.innerHTML += `
@@ -524,7 +526,6 @@
             `;
         });
 
-        // چالاککرنا ڕێزکرنێ (Sortable)
         if (window.sortableInstance) {
             window.sortableInstance.destroy();
         }
@@ -647,7 +648,15 @@
                 allFarmsData.push({ id: doc.id, ...doc.data() }); 
             });
 
+            // گوهۆڕینا ڕیزکرنێ: ل دەستپێکێ دێ ب sortOrder ڕیز کەت، پاشان ب دەمی
             allFarmsData.sort((a,b) => {
+                const orderA = a.sortOrder !== undefined ? a.sortOrder : 9999;
+                const orderB = b.sortOrder !== undefined ? b.sortOrder : 9999;
+                
+                if (orderA !== orderB) {
+                    return orderA - orderB;
+                }
+                
                 const tA = (a.createdAt && typeof a.createdAt.toMillis === 'function') ? a.createdAt.toMillis() : 0;
                 const tB = (b.createdAt && typeof b.createdAt.toMillis === 'function') ? b.createdAt.toMillis() : 0;
                 return tB - tA;
@@ -687,7 +696,10 @@
             let displayName = farm.ownerUsername ? farm.ownerUsername : "بێ ناڤێ خودانی";
 
             let adminCredsHTML = "";
+            let dragIcon = "";
+            
             if (currentUser.role === 'admin') {
+                dragIcon = `<i class="fas fa-grip-lines drag-handle" style="color: #cbd5e1; margin-left: 15px; cursor: grab; font-size: 1.5rem;" title="ڕابکێشە بۆ ڕێزکرنێ"></i>`;
                 adminCredsHTML = `
                 <div class="admin-creds-display">
                     <strong>ناڤێ مەزرەعێ:</strong> ${farm.name?.ar || farm.name || 'نینە'} <br>
@@ -701,9 +713,12 @@
             }
 
             container.innerHTML += `
-                <div class="farm-item">
+                <div class="farm-item" data-id="${farm.id}">
                     <div class="farm-header">
-                        <h4 style="color: var(--primary);"><i class="fas fa-user-circle" style="margin-left:5px;"></i> ${displayName}</h4>
+                        <h4 style="color: var(--primary); display: flex; align-items: center;">
+                            ${dragIcon}
+                            <i class="fas fa-user-circle" style="margin-left:5px;"></i> ${displayName}
+                        </h4>
                         <div class="action-buttons">
                             <button type="button" class="date-btn" onclick="openDateModal('${farm.id}')"><i class="fas fa-calendar-alt"></i></button>
                             <button type="button" class="edit-btn" onclick="editFarm('${farm.id}')"><i class="fas fa-pen"></i></button>
@@ -714,6 +729,55 @@
                 </div>
             `;
         });
+
+        // چالاککرنا ڕێزکرنێ د لیستا مەزرەعەیان دا (بۆ ئەدمینی)
+        if (currentUser.role === 'admin') {
+            if (window.farmSortableInstance) {
+                window.farmSortableInstance.destroy();
+            }
+            window.farmSortableInstance = new Sortable(container, {
+                animation: 150,
+                handle: '.drag-handle', // تەنێ ب ڕێیا ئایکۆنێ بهێتە ڕاکێشان
+                ghostClass: 'sortable-ghost',
+                onEnd: function() {
+                    document.getElementById('saveOrderBtn').style.display = 'block'; // دوگمەیا سەیڤکرنێ نیشان بدە
+                }
+            });
+        }
+    }
+
+    // فەنکشنی نوی بۆ پاشکەوتکرنا ڕیزبەندیێ ل داتابەیسێ
+    async function saveFarmOrder() {
+        const btn = document.getElementById('saveOrderBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> چاڤەڕێ بە...';
+        btn.disabled = true;
+
+        const items = document.querySelectorAll('#farms-container .farm-item');
+        const batch = db.batch();
+
+        items.forEach((item, index) => {
+            const id = item.getAttribute('data-id');
+            if(id) {
+                const ref = db.collection("farms").doc(id);
+                // هەژمارا 1 دێ بیتە ئێکەم مەزرەعە و هتد...
+                batch.update(ref, { sortOrder: index + 1 });
+            }
+        });
+
+        try {
+            await batch.commit();
+            document.getElementById('msg').innerText = "ڕیزبەندی ب سەرکەفتییانە هاتە گوهۆڕین! ✅";
+            document.getElementById('msg').style.display = 'block';
+            setTimeout(() => { document.getElementById('msg').style.display = 'none'; }, 3000);
+            
+            btn.style.display = 'none';
+            loadFarms(); // ئاپدەیتکرنا لیستێ دا دروستتر ببیت
+        } catch (error) {
+            alert("کێشە د پاشکەوتکرنێ دا هەیە: " + error.message);
+        } finally {
+            btn.innerHTML = '<i class="fas fa-save"></i> پاشکەوتکرنا ڕیزبەندیێ';
+            btn.disabled = false;
+        }
     }
 
     function filterFarms() {
@@ -764,12 +828,10 @@
             let finalImageUrls = []; 
             const imageElements = document.querySelectorAll('#currentImagesPreview .image-item');
             
-            // هژمارتنا وێنەیێن نووی بۆ دەقێ پێشڤەچوونێ
             let newUploadCount = 0;
             imageElements.forEach(el => { if(el.dataset.type === 'new') newUploadCount++; });
             let uploadedCount = 0;
 
-            // خڕڤەکرن و ئەپلۆدکرنا وێنان ل دووڤ ڕێزبەندیا نووی
             for (let el of imageElements) {
                 if (el.dataset.type === 'existing') {
                     finalImageUrls.push(el.dataset.url);
